@@ -1,0 +1,125 @@
+description: Efficient_tuning
+
+target:
+  # which virtual cluster you belong to (msrlabs, etc.). Everyone has access to "msrlabs".
+  service: amlk8s
+  name: itphyperdgx2cl1
+  #name: itplabrr1cl1
+  #name: itpeusp100cl
+  #vc: resrchvc
+  vc: hai3
+  #name: itplabrr1cl1
+  #name: itpeusp100cl
+
+  # physical cluster to use (cam, gcr, rr1, rr2) or Azure clusters (eu1, eu2, etc.)
+  # eu1(p100) eu2(p40), rr1 (v100) sc1(v100) sc3(v100)
+  #cluster: rr1
+
+storage:
+  my_storage:
+    storage_account_name: yaqing
+    container_name: phillytools
+
+
+environment:
+  registry: docker.io
+  image: yaqing/pytorch-efficient-tuning:v0.2
+#  registry: phillyregistry.azurecr.io
+#  setup:
+#    - pip install torch torchvision --user
+#    - pip install transformers --user
+#    - pip install seqeval --user
+#    - pip install flashtool --user
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  # $CONFIG_DIR is expanded to the directory of this config file
+  local_dir: ../
+
+
+search:
+    job_template:
+        name: search_{TASK}_{MODEL}_seed_{SEED}_{num_train_epochs}_inference_{IL}_{adapter_size}_{num_experts}_{BS}_consist_{use_consistency_loss}_{sharing_down}
+        sku: G16
+        command:
+          - python3 -m torch.distributed.launch --nproc_per_node=16 examples/text-classification/run_glue.py
+            --task_name {TASK}
+            --output_dir $$PT_OUTPUT_DIR/
+            --overwrite_output_dir
+            --do_train
+            --do_eval
+            --overwrite_cache
+            --model_name_or_path {MODEL}
+            --max_seq_length {max_seq_length}
+            --per_device_train_batch_size {BS}
+            --per_device_eval_batch_size 16
+            --learning_rate {LR}
+            --logging_steps 1000
+            --eval_steps {EVAL_STEP}
+            --num_train_epochs {num_train_epochs}
+            --seed {SEED}
+            --inference_level {IL}
+            --num_experts {num_experts}
+            --load_best_model_at_end
+            --metric_for_best_model {metric_for_best_model}
+            --evaluation_strategy {evaluation_strategy}
+            --save_strategy {save_strategy}
+            --warmup_ratio 0.06
+            --apply_expert_soup
+            --adapter_size {adapter_size}
+            --sharing_down {sharing_down}
+            --weight_decay 0.1
+            --use_consistency_loss {use_consistency_loss}
+
+
+    type: grid
+    max_trials: 1000
+    params:
+      - name: TASK
+        spec: discrete
+        values: ['rte']
+      - name: MODEL
+        spec: discrete
+        values: ['roberta-large'] # 'bert-large-uncased', 'bert-base-uncased', 'roberta-base', 'roberta-large', 'microsoft/deberta-base', 'microsoft/deberta-large']
+      - name: BS
+        spec: discrete
+        values: [4]
+      - name: max_seq_length
+        spec: discrete
+        values: [128]
+      - name: LR
+        spec: discrete
+        values: [3e-4] #1e-2, 1e-3]
+      - name: num_train_epochs
+        spec: discrete
+        values: [40, 60, 80]
+      - name: EVAL_STEP
+        spec: discrete
+        values: [5000]
+      - name: SEED
+        spec: discrete
+        values: [0] #, 2, 3, 4, 5]
+      - name: IL
+        spec: discrete
+        values: [3]
+      - name: num_experts
+        spec: discrete
+        values: [4]
+      - name: adapter_size
+        spec: discrete
+        values: [16]
+      - name: metric_for_best_model
+        spec: discrete
+        values: ['accuracy']
+      - name: evaluation_strategy
+        spec: discrete
+        values: ['epoch']
+      - name: save_strategy
+        spec: discrete
+        values: [ 'epoch' ]
+      - name: sharing_down
+        spec: discrete
+        values: [0, 1]
+      - name: use_consistency_loss
+        spec: discrete
+        values: [0, 1]
