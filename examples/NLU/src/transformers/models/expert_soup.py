@@ -58,13 +58,10 @@ class MixtureSoup(torch.nn.Module):
         return output
 
     def expert_soup(self):
-
         weight = F.softmax(self.expert_score_weight)
-        print(weight)
         if self.weight_strategy == "hard":
             subnet = GetSubnet.apply(weight, self.sparsity)
             weight = subnet / subnet.sum()
-
         self.parameter_dict = {"weight": 0, "bias": 0}
         for idx in range(self.num_local_experts):
             single_expert = self.deepspeed_experts[idx]
@@ -75,6 +72,7 @@ class MixtureSoup(torch.nn.Module):
                 else:
                     p_name = "bias"
                     self.parameter_dict[p_name] = self.parameter_dict[p_name] + (weight[idx] * s_param)
+
 
     def forward(self, *input: Tensor):
         expert_output = None
@@ -87,29 +85,36 @@ class MixtureSoup(torch.nn.Module):
                 expert_output = self.get_expert_by_idx(expert_idx)(input[0])
 
         else:
-            result = []
-            for expert_idx in range(self.num_local_experts):
-                temp = self.get_expert_by_idx(expert_idx)(input[0])
-                result.append(temp)
-            result = torch.stack(result, dim=0)
+            if self.inference_level != 3:
+                result = []
+                for expert_idx in range(self.num_local_experts):
+                    temp = self.get_expert_by_idx(expert_idx)(input[0])
+                    result.append(temp)
+                result = torch.stack(result, dim=0)
 
-            if self.inference_level == 0:  # token level
-                mask = torch.randint(0, self.num_local_experts,
-                                     size=(result.size(1), result.size(2)), device=result.device)
-                for i in range(self.num_local_experts):
-                    expert_mask = mask.eq(i)
-                    result[i] *= expert_mask.unsqueeze(-1)
-                expert_output = result.sum(0)
-            elif self.inference_level == 1:  # sentence level
-                mask = torch.randint(0, self.num_local_experts,
-                                     size=(result.size(1),), device=result.device)
-                for i in range(self.num_local_experts):
-                    expert_mask = mask.eq(i)
-                    result[i] *= expert_mask.unsqueeze(-1).unsqueeze(-1)
-                expert_output = result.sum(0)
-            elif self.inference_level == 3:  # ensemble
-                expert_output = result.mean(0)
-            elif self.inference_level == 4:
+                if self.inference_level == 0:  # token level
+                    mask = torch.randint(0, self.num_local_experts,
+                                         size=(result.size(1), result.size(2)), device=result.device)
+                    for i in range(self.num_local_experts):
+                        expert_mask = mask.eq(i)
+                        result[i] *= expert_mask.unsqueeze(-1)
+                    expert_output = result.sum(0)
+                elif self.inference_level == 1:  # sentence level
+                    mask = torch.randint(0, self.num_local_experts,
+                                         size=(result.size(1),), device=result.device)
+                    for i in range(self.num_local_experts):
+                        expert_mask = mask.eq(i)
+                        result[i] *= expert_mask.unsqueeze(-1).unsqueeze(-1)
+                    expert_output = result.sum(0)
+            # elif self.inference_level == 3:  # ensemble
+            #     expert_output = result.mean(0)
+            elif self.inference_level == 3:
+                # result = []
+                # for expert_idx in range(self.num_local_experts):
+                #     temp = self.get_expert_by_idx(expert_idx)(input[0])
+                #     result.append(temp)
+                # result = torch.stack(result, dim=0)
+                # expert_output = result.mean(0)
                 self.expert_soup()
                 expert_output = self.expert_soup_forward(input[0])
 
@@ -140,3 +145,14 @@ class ExpertSoup(nn.Module):
             result = self.act(result)
         result = self.MoA_B(result)
         return result + residual
+
+#
+
+def selective_state_dict(model, keys):
+    my_state_dict = model.state_dict()
+    to_return = {}
+    for key in keys:
+        for k in my_state_dict:
+            if key in k:
+                to_return[k] = my_state_dict[k]
+            return to_return

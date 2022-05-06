@@ -23,7 +23,7 @@ storage:
 
 environment:
   registry: docker.io
-  image: yaqing/pytorch-efficient-tuning:v0.2
+  image: yaqing/pytorch-efficient-tuning:v0.3
 #  registry: phillyregistry.azurecr.io
 #  setup:
 #    - pip install torch torchvision --user
@@ -78,37 +78,37 @@ search:
     params:
       - name: TASK
         spec: discrete
-        values: ['mnli']
+        values: ['mrpc']
       - name: MODEL
         spec: discrete
-        values: ['roberta-large'] # 'bert-large-uncased', 'bert-base-uncased', 'roberta-base', 'roberta-large', 'microsoft/deberta-base', 'microsoft/deberta-large']
+        values: ['bert-base-uncased'] # 'bert-large-uncased', 'bert-base-uncased', 'roberta-base', 'roberta-large', 'microsoft/deberta-base', 'microsoft/deberta-large']
       - name: BS
         spec: discrete
-        values: [4]
+        values: [1,2,4]
       - name: max_seq_length
         spec: discrete
         values: [128]
       - name: LR
         spec: discrete
-        values: [3e-4] #1e-2, 1e-3]
+        values: [4e-4, 5e-4] #1e-2, 1e-3]
       - name: num_train_epochs
         spec: discrete
-        values: [40]
+        values: [60, 80, 100]
       - name: EVAL_STEP
         spec: discrete
         values: [5000]
       - name: SEED
         spec: discrete
-        values: [0] #, 2, 3, 4, 5]
+        values: [0, 1, 42] #, 2, 3, 4, 5]
       - name: IL
         spec: discrete
         values: [3]
       - name: num_experts
         spec: discrete
-        values: [8]
+        values: [4]
       - name: adapter_size
         spec: discrete
-        values: [16]
+        values: [48]
       - name: metric_for_best_model
         spec: discrete
         values: ['accuracy']
@@ -120,10 +120,10 @@ search:
         values: [ 'epoch' ]
       - name: sharing_down
         spec: discrete
-        values: [ 0 ]
+        values: [ 0]
       - name: sharing_up
         spec: discrete
-        values: [1]
+        values: [ 1]
       - name: use_consistency_loss
         spec: discrete
         values: [1]

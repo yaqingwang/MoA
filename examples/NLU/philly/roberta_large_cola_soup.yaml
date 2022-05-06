@@ -78,7 +78,7 @@ search:
     params:
       - name: TASK
         spec: discrete
-        values: ['mnli']
+        values: ['cola']
       - name: MODEL
         spec: discrete
         values: ['roberta-large'] # 'bert-large-uncased', 'bert-base-uncased', 'roberta-base', 'roberta-large', 'microsoft/deberta-base', 'microsoft/deberta-large']
@@ -90,28 +90,28 @@ search:
         values: [128]
       - name: LR
         spec: discrete
-        values: [3e-4] #1e-2, 1e-3]
+        values: [3e-4, 4e-4] #1e-2, 1e-3]
       - name: num_train_epochs
         spec: discrete
-        values: [40]
+        values: [20, 40, 60, 80]
       - name: EVAL_STEP
         spec: discrete
         values: [5000]
       - name: SEED
         spec: discrete
-        values: [0] #, 2, 3, 4, 5]
+        values: [0, 1, 2] #, 2, 3, 4, 5]
       - name: IL
         spec: discrete
         values: [3]
       - name: num_experts
         spec: discrete
-        values: [8]
+        values: [4]
       - name: adapter_size
         spec: discrete
         values: [16]
       - name: metric_for_best_model
         spec: discrete
-        values: ['accuracy']
+        values: ['matthews_correlation']
       - name: evaluation_strategy
         spec: discrete
         values: ['epoch']
@@ -123,7 +123,7 @@ search:
         values: [ 0 ]
       - name: sharing_up
         spec: discrete
-        values: [1]
+        values: [ 1]
       - name: use_consistency_loss
         spec: discrete
-        values: [1]
+        values: [0, 1]

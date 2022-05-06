@@ -452,9 +452,10 @@ def main():
     if model_args.apply_expert_soup:
         if model_args.expert_soup_path is not None:
             soup_state_dict = torch.load(model_args.expert_soup_path)
+
             logger.info(f"Apply expert soup state dict from {model_args.expert_soup_path}.")
             logger.info(soup_state_dict.keys())
-            model.load_state_dict(soup_state_dict , strict=False)
+            model.load_state_dict(soup_state_dict, strict=False)
         trainable_params.append('ExpertSoup')
         fixed_params.append('expert_score_weight')
 
@@ -463,7 +464,7 @@ def main():
 
     if len(trainable_params) > 0:
         for name, param in model.named_parameters():
-            if name.startswith('deberta') or name.startswith('roberta'):
+            if name.startswith('deberta') or name.startswith('roberta') or name.startswith('bert'):
                 param.requires_grad = False
                 for trainable_param in trainable_params:
                     if trainable_param in name:
@@ -474,8 +475,11 @@ def main():
                         if fixed_param in name:
                             param.requires_grad = False
                             break
+            # else:
+            #     raise NotImplementedError
             else:
                 param.requires_grad = True
+
 
     # Preprocessing the datasets
     if data_args.task_name is not None:
@@ -579,6 +583,7 @@ def main():
     # You can define your custom compute_metrics function. It takes an `EvalPrediction` object (a namedtuple with a
     # predictions and label_ids field) and has to return a dictionary string to float.
     def compute_metrics(p: EvalPrediction):
+ 
         preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
         preds = np.squeeze(preds) if is_regression else np.argmax(preds, axis=1)
         if data_args.task_name is not None:
@@ -611,6 +616,8 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
     )
+
+
 
     # Training
     if training_args.do_train:
@@ -679,8 +686,7 @@ def main():
     #     trainer.save_metrics("expert_train", metrics)
     #     trainer.save_state()
 
-
-
+    trainer.save_partial_model(keys=["ExpertSoup", "classifier"])
     # Evaluation
     if training_args.do_eval:
         logger.info("*** Evaluate ***")

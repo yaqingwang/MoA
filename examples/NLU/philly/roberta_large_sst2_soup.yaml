@@ -23,7 +23,7 @@ storage:
 
 environment:
   registry: docker.io
-  image: yaqing/pytorch-efficient-tuning:v0.1
+  image: yaqing/pytorch-efficient-tuning:v0.2
 #  registry: phillyregistry.azurecr.io
 #  setup:
 #    - pip install torch torchvision --user
@@ -39,7 +39,7 @@ code:
 
 search:
     job_template:
-        name: search_{TASK}_{MODEL}_seed_{SEED}_{num_train_epochs}_inference_{IL}_{adapter_size}_{num_experts}_{BS}
+        name: search_{TASK}_{MODEL}_seed_{SEED}_{num_train_epochs}_inference_{IL}_{adapter_size}_{num_experts}_{BS}_consist_{use_consistency_loss}_{sharing_down}_{sharing_up}_{LR}
         sku: G16
         command:
           - python3 -m torch.distributed.launch --nproc_per_node=16 examples/text-classification/run_glue.py
@@ -67,6 +67,11 @@ search:
             --warmup_ratio 0.06
             --apply_expert_soup
             --adapter_size {adapter_size}
+            --sharing_down {sharing_down}
+            --sharing_up {sharing_up}
+            --weight_decay 0.1
+            --use_consistency_loss {use_consistency_loss}
+
 
 
     type: grid
@@ -86,10 +91,10 @@ search:
         values: [128]
       - name: LR
         spec: discrete
-        values: [3e-4] #1e-2, 1e-3]
+        values: [5e-4] #1e-2, 1e-3]
       - name: num_train_epochs
         spec: discrete
-        values: [20, 30, 40]
+        values: [20]
       - name: EVAL_STEP
         spec: discrete
         values: [5000]
@@ -104,7 +109,7 @@ search:
         values: [4]
       - name: adapter_size
         spec: discrete
-        values: [8, 16]
+        values: [16]
       - name: metric_for_best_model
         spec: discrete
         values: ['accuracy']
@@ -114,3 +119,12 @@ search:
       - name: save_strategy
         spec: discrete
         values: [ 'epoch' ]
+      - name: sharing_down
+        spec: discrete
+        values: [ 0 ]
+      - name: sharing_up
+        spec: discrete
+        values: [ 1 ]
+      - name: use_consistency_loss
+        spec: discrete
+        values: [ 1 ]

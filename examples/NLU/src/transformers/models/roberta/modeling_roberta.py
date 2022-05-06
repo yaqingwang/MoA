@@ -1244,11 +1244,13 @@ class RobertaForSequenceClassification(RobertaPreTrainedModel):
         logits = self.classifier(sequence_output)
 
         loss = None
+
         if labels is not None:
             if self.num_labels == 1:
                 #  We are doing regression
                 loss_fct = MSELoss()
                 loss = loss_fct(logits.view(-1), labels.view(-1))
+
             else:
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
@@ -1256,7 +1258,7 @@ class RobertaForSequenceClassification(RobertaPreTrainedModel):
 
 
 
-        if self.config.use_consistency_loss and self.roberta.training:
+        if self.config.use_consistency_loss == 1 and self.roberta.training:
             outputs = self.roberta(
                 input_ids,
                 attention_mask=attention_mask,
@@ -1280,6 +1282,8 @@ class RobertaForSequenceClassification(RobertaPreTrainedModel):
             #         loss_fct = CrossEntropyLoss()
             #         loss += loss_fct(logits_additional.view(-1, self.num_labels), labels.view(-1))
 
+        if self.config.finetuning_task == 'stsb':
+            logits = torch.clip(logits, min=0)
 
         if not return_dict:
             output = (logits,) + outputs[2:]

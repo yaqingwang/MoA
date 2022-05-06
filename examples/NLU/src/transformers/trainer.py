@@ -1539,6 +1539,44 @@ class Trainer:
         elif self.is_world_process_zero():
             self._save(output_dir)
 
+    def save_partial_model(self, output_dir: Optional[str] = None, keys = None, weights_name="expert_soup"):
+        """
+        Will save the model, so you can reload it using :obj:`from_pretrained()`.
+
+        Will only save from the main process.
+        """
+        if is_torch_tpu_available():
+            self._save_tpu(output_dir)
+        elif (
+                ShardedDDPOption.ZERO_DP_2 in self.args.sharded_ddp or ShardedDDPOption.ZERO_DP_3 in self.args.sharded_ddp
+        ):
+            if self.is_world_process_zero():
+                state_dict = self.model.state_dict()
+                if keys is not None:
+                    to_return = {}
+                    for key in keys:
+                        for k in state_dict:
+                            if key in k:
+                                to_return[k] = state_dict[k]
+                    state_dict = to_return
+                output_dir = output_dir if output_dir is not None else self.args.output_dir
+                os.makedirs(output_dir, exist_ok=True)
+                logger.info("Saving model checkpoint to %s", output_dir)
+                torch.save(state_dict, os.path.join(output_dir,"pytorch_model_"+weights_name+".bin"))
+        elif self.is_world_process_zero():
+            state_dict = self.model.state_dict()
+            if keys is not None:
+                to_return = {}
+                for key in keys:
+                    for k in state_dict:
+                        if key in k:
+                            to_return[k] = state_dict[k]
+                state_dict = to_return
+            output_dir = output_dir if output_dir is not None else self.args.output_dir
+            os.makedirs(output_dir, exist_ok=True)
+            logger.info("Saving model checkpoint to %s", output_dir)
+            torch.save(state_dict, os.path.join(output_dir,"pytorch_model_"+weights_name+".bin"))
+
     def _save_tpu(self, output_dir: Optional[str] = None):
         output_dir = output_dir if output_dir is not None else self.args.output_dir
         logger.info("Saving model checkpoint to %s", output_dir)

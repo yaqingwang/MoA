@@ -26,7 +26,16 @@ import torch
 import torch.utils.checkpoint
 from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
-
+from transformers.models.adapter import Adapter
+from transformers.models.expert_soup import ExpertSoup
+import torch.nn.functional as F
+from ...activations import ACT2FN, gelu
+from ...file_utils import (
+    add_code_sample_docstrings,
+    add_start_docstrings,
+    add_start_docstrings_to_model_forward,
+    replace_return_docstrings,
+)
 from ...activations import ACT2FN
 from ...file_utils import (
     ModelOutput,
@@ -419,10 +428,30 @@ class BertOutput(nn.Module):
         self.dense = nn.Linear(config.intermediate_size, config.hidden_size)
         self.LayerNorm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.adapter_type = config.adapter_type
+        if config.apply_adapter:
+            self.adapter = Adapter(config.hidden_size, config.adapter_size,
+                                   'swish' if config.adapter_type == 'houlsby' else 'relu')
+        if config.apply_expert_soup:
+            self.ExpertSoup = ExpertSoup(config.hidden_size, config.adapter_size, 'gelu', num_expert=config.num_experts,
+                                         inference_level=config.inference_level, sharing_down=config.sharing_down,
+                                         sharing_up=config.sharing_up, weight_strategy=config.weight_strategy,
+                                         sparsity=config.sparsity)
 
     def forward(self, hidden_states, input_tensor):
         hidden_states = self.dense(hidden_states)
-        hidden_states = self.dropout(hidden_states)
+        # hidden_states = self.dropout(hidden_states)
+        if hasattr(self, 'adapter'):
+            hidden_states = self.dropout(hidden_states)
+            residual = hidden_states
+            if self.adapter_type == 'pfeiffer':
+                hidden_states = self.LayerNorm(hidden_states + input_tensor)
+            hidden_states = self.adapter(hidden_states, residual=residual)
+
+        if hasattr(self, 'ExpertSoup'):
+            hidden_states = self.ExpertSoup(hidden_states, residual=hidden_states)
+        if not hasattr(self, 'adapter'):
+            hidden_states = self.dropout(hidden_states)
         hidden_states = self.LayerNorm(hidden_states + input_tensor)
         return hidden_states
 
