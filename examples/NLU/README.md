@@ -9,15 +9,15 @@ We report below the dev set results, taking the medium over 5 runs:
 ## Download LoRA checkpoints
 
 |   | Dataset  | BERT base 110M <br>   | RoBERTa large 355M <br>  |
-|---|----------|--------------------|----------------------|------------------|
-|   | MNLI     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_mnli_expert_soup.bin) |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_mnli_expert_soup.bin) |
-|   | SST2     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_sst2_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_sst2_expert_soup.bin)  |
-|   | MRPC     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_mrpc_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_mrpc_expert_soup.bin)  |
-|   | CoLA     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_cola_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_cola_expert_soup.bin)  |
-|   | QNLI     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_qnli_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_qnli_expert_soup.bin)  |
-|   | QQP      |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_qqp_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_qqp_expert_soup.bin)  |
-|   | RTE      |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_rte_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_rte_expert_soup.bin)  |
-|   | STSB     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_stsb_expert_soup.bin)  |[7.1 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_stsb_expert_soup.bin)  |
+|---|----------|--------------------|----------------------|
+|   | MNLI     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_mnli_expert_soup.bin) |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_mnli_expert_soup.bin) |
+|   | SST2     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_sst2_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_sst2_expert_soup.bin)  |
+|   | MRPC     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_mrpc_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_mrpc_expert_soup.bin)  |
+|   | CoLA     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_cola_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_cola_expert_soup.bin)  |
+|   | QNLI     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_qnli_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_qnli_expert_soup.bin)  |
+|   | QQP      |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_qqp_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_qqp_expert_soup.bin)  |
+|   | RTE      |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_rte_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_rte_expert_soup.bin)  |
+|   | STSB     |[8.5 MB](https://github.com/yaqingwang/MoA/releases/download/bert_base/pytorch_model_stsb_expert_soup.bin)  |[11.7 MB](https://github.com/yaqingwang/MoA/releases/download/roberta_large/pytorch_model_stsb_expert_soup.bin)  |
 
 ## Steps to reproduce our results
 ### Create and activate conda env
