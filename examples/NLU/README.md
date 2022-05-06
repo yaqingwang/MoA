@@ -6,7 +6,7 @@ We report below the dev set results, taking the medium over 5 runs:
 
 
 
-## Download LoRA checkpoints
+## Download MoA checkpoints
 
 |   | Dataset  | BERT base 110M <br>   | RoBERTa large 355M <br>  |
 |---|----------|--------------------|----------------------|
