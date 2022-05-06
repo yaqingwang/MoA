@@ -63,7 +63,6 @@ examples/text-classification/run_glue.py \
 --save_strategy epoch \
 --warmup_ratio 0.06 \
 --apply_expert_soup \
---adapter_type houlsby \
 --adapter_size 16 \
 --num_experts 4 \
 --seed 0 \
