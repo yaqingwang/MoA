@@ -1,28 +1,14 @@
-# Adapting RoBERTa and DeBERTa V2 using LoRA
 
-This folder contains the implementation of LoRA in RoBERTa and DeBERTa V2 using the Python package `lora`. LoRA is described in the following pre-print:
-
-**LoRA: Low-Rank Adaptation of Large Language Models** <br>
-*Edward J. Hu\*, Yelong Shen\*, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen* <br>
-Paper: https://arxiv.org/abs/2106.09685 <br>
 
 ## Adapting to the GLUE Benchmark
 Our experiments on the GLUE benchmark are run on 4 NVIDIA Tesla V100 GPU cards out of a DGX-1. The results may vary due to different GPU models, drivers, CUDA SDK versions, floating-point precisions, and random seeds. 
 We report below the dev set results, taking the medium over 5 runs:
 
-<p>
-<img src="figures/LoRA_NLU.PNG" width="800" >
-</p>
 
-Here are the GLUE benchmark test set results for DeBERTa XXL 1.5B (no ensemble):
-
-<p>
-<img src="figures/deberta_lora_glue.jpg" width="800" >
-</p>
 
 ## Download LoRA checkpoints
 
-|   | Dataset  | RoBERTa base 125M <br> LoRA - 0.3 M  | RoBERTa large 355M <br> LoRA - 0.8 M  | DeBERTa XXL 1.5B <br> LoRA - 4.7 M |
+|   | Dataset  | BERT base 110M <br>   | RoBERTa large 355M <br>  |
 |---|----------|--------------------|----------------------|------------------|
 |   | MNLI     |[3.4 MB](https://github.com/msft-edward/LoRA_private/releases/download/RoBERTa-base/roberta_base_lora_mnli.bin) |[7.1 MB](https://github.com/msft-edward/LoRA_private/releases/download/RoBERTa-large/roberta_large_lora_mnli.bin) |[27.1 MB](https://github.com/msft-edward/LoRA_private/releases/download/DeBERTa/deberta_v2_xxlarge_lora_mnli.bin) |
 |   | SST2     |[3.4 MB](https://github.com/msft-edward/LoRA_private/releases/download/RoBERTa-base/roberta_base_lora_sst2.bin)  |[7.1 MB](https://github.com/msft-edward/LoRA_private/releases/download/RoBERTa-large/roberta_large_lora_sst2.bin)  |[27.1 MB](https://github.com/msft-edward/LoRA_private/releases/download/DeBERTa/deberta_v2_xxlarge_lora_mnli.bin)  |
